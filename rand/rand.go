@@ -1,4 +1,4 @@
-package randextensions
+package rand
 
 import "math/rand"
 
