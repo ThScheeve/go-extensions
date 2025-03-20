@@ -1,9 +1,13 @@
+// Copyright 2025 Thom Scheeve. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 package rand
 
 import "math/rand"
 
 // The interval constants represent the different types of intervals that can be used
-// when generating random numbers. Definition are according to ISO 80000-2:2019(en).
+// when generating random numbers. Definitions are according to ISO 80000-2:2019(en).
 type interval uint8
 
 const (
