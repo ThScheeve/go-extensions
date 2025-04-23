@@ -232,9 +232,26 @@ func testDeepClone_pointer(t *testing.T) {
 	assertEqual(t, *x, 0)
 }
 
+func testDeepClone_slice(t *testing.T) {
+	var x []int
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	x = make([]int, 3)
+	y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	y[0] = 42
+	assertNotEqual(t, y, x)
+	assertEqual(t, x[0], 0)
+}
+
 var deepCloneTests = []func(t *testing.T){
 	testDeepClone_any,
 	testDeepClone_pointer,
+	testDeepClone_slice,
 }
 
 func TestDeepClone(t *testing.T) {
