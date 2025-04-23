@@ -334,6 +334,24 @@ func testDeepClone_struct(t *testing.T) {
 	assertEqual(t, x.Foo, 1)
 }
 
+func testDeepClone_struct_unexported_fields(t *testing.T) {
+	type S struct {
+		foo, bar int
+	}
+	var x S
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	x = S{1, 2}
+	y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+	y.foo = 42
+	assertNotEqual(t, y, x)
+	assertEqual(t, x.foo, 1)
+}
+
 var deepCloneTests = []func(t *testing.T){
 	testDeepClone_any,
 	testDeepClone_array,
@@ -342,6 +360,7 @@ var deepCloneTests = []func(t *testing.T){
 	testDeepClone_pointer,
 	testDeepClone_slice,
 	testDeepClone_struct,
+	testDeepClone_struct_unexported_fields,
 }
 
 func TestDeepClone(t *testing.T) {

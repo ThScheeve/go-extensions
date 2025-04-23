@@ -7,6 +7,7 @@ package deep
 import (
 	"log"
 	"reflect"
+	"unsafe"
 )
 
 // Checks for identity
@@ -93,8 +94,11 @@ func deepValueClone(v reflect.Value) reflect.Value {
 		return val
 	case reflect.Struct:
 		val := reflect.New(v.Type()).Elem()
+		val.Set(v)
 		for i := 0; i < v.NumField(); i++ {
-			val.Field(i).Set(deepValueClone(v.Field(i)))
+			f := val.Field(i)
+			f = reflect.NewAt(f.Type(), unsafe.Pointer(f.UnsafeAddr())).Elem()
+			f.Set(deepValueClone(f))
 		}
 		return val
 	default:
