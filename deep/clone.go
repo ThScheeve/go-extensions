@@ -57,6 +57,16 @@ func deepValueClone(v reflect.Value) reflect.Value {
 		val := reflect.New(v.Elem().Type())
 		val.Elem().Set(deepValueClone(v.Elem()))
 		return val
+	case reflect.Map:
+		if v.IsNil() {
+			log.Default().Printf("deepValueClone: nil %v", v.Kind())
+			return v
+		}
+		val := reflect.MakeMapWithSize(v.Type(), v.Len())
+		for _, k := range v.MapKeys() {
+			val.SetMapIndex(deepValueClone(k), deepValueClone(v.MapIndex(k)))
+		}
+		return val
 	case reflect.Pointer:
 		if v.IsNil() {
 			log.Default().Printf("deepValueClone: nil %v", v.Kind())

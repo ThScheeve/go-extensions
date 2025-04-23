@@ -218,6 +218,14 @@ func testDeepClone_any(t *testing.T) {
 func testDeepClone_interface(t *testing.T) {
 	var x, y any
 
+	x = make(map[string]any)
+	y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+	y.(map[string]any)["foo"] = 42
+	assertNotEqual(t, y, x)
+	assertEqual(t, x.(map[string]any)["foo"], nil)
+
 	x = new(any)
 	y = DeepClone(x)
 	assertEqual(t, y, x)
@@ -233,6 +241,21 @@ func testDeepClone_interface(t *testing.T) {
 	y.([]any)[0] = 42
 	assertNotEqual(t, y, x)
 	assertEqual(t, x.([]any)[0], nil)
+}
+
+func testDeepClone_map(t *testing.T) {
+	var x map[string]int
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	x = map[string]int{"foo": 1, "bar": 2}
+	y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+	y["foo"] = 42
+	assertNotEqual(t, y, x)
+	assertEqual(t, x["foo"], 1)
 }
 
 func testDeepClone_pointer(t *testing.T) {
@@ -268,6 +291,7 @@ func testDeepClone_slice(t *testing.T) {
 var deepCloneTests = []func(t *testing.T){
 	testDeepClone_any,
 	testDeepClone_interface,
+	testDeepClone_map,
 	testDeepClone_pointer,
 	testDeepClone_slice,
 }
