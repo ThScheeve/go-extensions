@@ -47,8 +47,16 @@ func DeepClone[T any](x T) T {
 }
 
 func deepValueClone(v reflect.Value) reflect.Value {
-	log.Default().Printf("deepValueClone: %v", v.Kind())
+	log.Default().Printf("deepValueClone: %v %v", v.Kind(), v.Type())
 	switch v.Kind() {
+	case reflect.Interface:
+		if v.IsNil() {
+			log.Default().Printf("deepValueClone: nil %v", v.Kind())
+			return v
+		}
+		val := reflect.New(v.Elem().Type())
+		val.Elem().Set(deepValueClone(v.Elem()))
+		return val
 	case reflect.Pointer:
 		if v.IsNil() {
 			log.Default().Printf("deepValueClone: nil %v", v.Kind())
