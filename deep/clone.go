@@ -36,3 +36,16 @@ func Is(x, y any) bool {
 		return false
 	}
 }
+
+func DeepClone[T any](x T) T {
+	v := reflect.ValueOf(x)
+	if !v.IsValid() {
+		log.Default().Printf("deepClone: nil")
+		return x
+	}
+	return deepValueClone(v).Interface().(T)
+}
+
+func deepValueClone(x reflect.Value) reflect.Value {
+	return x
+}

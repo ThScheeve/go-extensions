@@ -197,3 +197,22 @@ func TestIs(t *testing.T) {
 		t.Run(runtime.FuncForPC(reflect.ValueOf(tfn).Pointer()).Name(), tfn)
 	}
 }
+
+func testDeepClone_any(t *testing.T) {
+	for _, v := range primitiveValues {
+		x := v
+		y := DeepClone(x)
+		assertEqual(t, y, x)
+		assertIsNot(t, x, y)
+	}
+}
+
+var deepCloneTests = []func(t *testing.T){
+	testDeepClone_any,
+}
+
+func TestDeepClone(t *testing.T) {
+	for _, tfn := range deepCloneTests {
+		t.Run(runtime.FuncForPC(reflect.ValueOf(tfn).Pointer()).Name(), tfn)
+	}
+}
