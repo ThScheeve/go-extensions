@@ -46,6 +46,6 @@ func DeepClone[T any](x T) T {
 	return deepValueClone(v).Interface().(T)
 }
 
-func deepValueClone(x reflect.Value) reflect.Value {
-	return x
+func deepValueClone(v reflect.Value) reflect.Value {
+	return v
 }

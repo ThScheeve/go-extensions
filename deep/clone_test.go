@@ -199,11 +199,19 @@ func TestIs(t *testing.T) {
 }
 
 func testDeepClone_any(t *testing.T) {
+	var x any
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
 	for _, v := range primitiveValues {
-		x := v
-		y := DeepClone(x)
+		x = v
+		y = DeepClone(x)
 		assertEqual(t, y, x)
 		assertIsNot(t, x, y)
+		y = "42"
+		assertNotEqual(t, y, x)
+		assertEqual(t, x, v)
 	}
 }
 
