@@ -233,34 +233,42 @@ func testDeepClone_array(t *testing.T) {
 func testDeepClone_interface(t *testing.T) {
 	var x, y any
 
-	x = [3]any{1, 2, 3}
-	y = DeepClone(x)
-	assertEqual(t, y, x)
-	assertIsNot(t, x, y)
+	t.Run("Array", func(t *testing.T) {
+		x = [3]any{0, 0, 0}
+		y = DeepClone(x)
+		assertEqual(t, y, x)
+		assertIsNot(t, x, y)
+	})
 
-	x = make(map[string]any)
-	y = DeepClone(x)
-	assertEqual(t, y, x)
-	assertIsNot(t, x, y)
-	y.(map[string]any)["foo"] = 42
-	assertNotEqual(t, y, x)
-	assertEqual(t, x.(map[string]any)["foo"], nil)
+	t.Run("Map", func(t *testing.T) {
+		x = make(map[string]any)
+		y = DeepClone(x)
+		assertEqual(t, y, x)
+		assertIsNot(t, x, y)
+		y.(map[string]any)["foo"] = 42
+		assertNotEqual(t, y, x)
+		assertEqual(t, x.(map[string]any)["foo"], nil)
+	})
 
-	x = new(any)
-	y = DeepClone(x)
-	assertEqual(t, y, x)
-	assertIsNot(t, x, y)
-	*y.(*any) = 42
-	assertNotEqual(t, y, x)
-	assertEqual(t, *x.(*any), nil)
+	t.Run("Pointer", func(t *testing.T) {
+		x = new(any)
+		y = DeepClone(x)
+		assertEqual(t, y, x)
+		assertIsNot(t, x, y)
+		*y.(*any) = 42
+		assertNotEqual(t, y, x)
+		assertEqual(t, *x.(*any), nil)
+	})
 
-	x = make([]any, 3)
-	y = DeepClone(x)
-	assertEqual(t, y, x)
-	assertIsNot(t, x, y)
-	y.([]any)[0] = 42
-	assertNotEqual(t, y, x)
-	assertEqual(t, x.([]any)[0], nil)
+	t.Run("Slice", func(t *testing.T) {
+		x = make([]any, 3)
+		y = DeepClone(x)
+		assertEqual(t, y, x)
+		assertIsNot(t, x, y)
+		y.([]any)[0] = 42
+		assertNotEqual(t, y, x)
+		assertEqual(t, x.([]any)[0], nil)
+	})
 }
 
 func testDeepClone_map(t *testing.T) {
@@ -308,6 +316,24 @@ func testDeepClone_slice(t *testing.T) {
 	assertEqual(t, x[0], 0)
 }
 
+func testDeepClone_struct(t *testing.T) {
+	type S struct {
+		Foo, Bar int
+	}
+	var x S
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	x = S{1, 2}
+	y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+	y.Foo = 42
+	assertNotEqual(t, y, x)
+	assertEqual(t, x.Foo, 1)
+}
+
 var deepCloneTests = []func(t *testing.T){
 	testDeepClone_any,
 	testDeepClone_array,
@@ -315,6 +341,7 @@ var deepCloneTests = []func(t *testing.T){
 	testDeepClone_map,
 	testDeepClone_pointer,
 	testDeepClone_slice,
+	testDeepClone_struct,
 }
 
 func TestDeepClone(t *testing.T) {

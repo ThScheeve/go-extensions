@@ -91,6 +91,12 @@ func deepValueClone(v reflect.Value) reflect.Value {
 			val.Index(i).Set(deepValueClone(v.Index(i)))
 		}
 		return val
+	case reflect.Struct:
+		val := reflect.New(v.Type()).Elem()
+		for i := 0; i < v.NumField(); i++ {
+			val.Field(i).Set(deepValueClone(v.Field(i)))
+		}
+		return val
 	default:
 		log.Default().Printf("deepValueClone: default")
 		return v
