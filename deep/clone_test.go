@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"runtime"
 	"testing"
+	"time"
 )
 
 func ptr[T any](x T) *T {
@@ -230,6 +231,38 @@ func testDeepClone_array(t *testing.T) {
 	assertEqual(t, x[0], 1)
 }
 
+func testDeepClone_chan(t *testing.T) {
+	var x chan int
+	var y = DeepClone(x)
+	assertEqual(t, y, x)
+	assertIsNot(t, x, y)
+
+	f := func(ch chan int, n int) {
+		ch <- n
+		close(ch)
+	}
+
+	// unbuffered
+	x = make(chan int)
+	go f(x, 42)
+	time.Sleep(100 * time.Millisecond)
+	y = DeepClone(x)
+	assertNotEqual(t, y, x)
+	assertIsNot(t, x, y)
+	assertEqual(t, len(y), 0)
+	assertEqual(t, cap(y), 0)
+
+	// buffered
+	x = make(chan int, 3)
+	go f(x, 42)
+	time.Sleep(100 * time.Millisecond)
+	y = DeepClone(x)
+	assertNotEqual(t, y, x)
+	assertIsNot(t, x, y)
+	assertEqual(t, len(y), 0)
+	assertEqual(t, cap(y), 3)
+}
+
 func testDeepClone_interface(t *testing.T) {
 	var x, y any
 
@@ -355,6 +388,7 @@ func testDeepClone_struct_unexported_fields(t *testing.T) {
 var deepCloneTests = []func(t *testing.T){
 	testDeepClone_any,
 	testDeepClone_array,
+	testDeepClone_chan,
 	testDeepClone_interface,
 	testDeepClone_map,
 	testDeepClone_pointer,

@@ -56,6 +56,13 @@ func deepValueClone(v reflect.Value) reflect.Value {
 			val.Index(i).Set(deepValueClone(v.Index(i)))
 		}
 		return val
+	case reflect.Chan:
+		if v.IsNil() {
+			log.Default().Printf("deepValueClone: nil %v", v.Kind())
+			return v
+		}
+		val := reflect.MakeChan(v.Type(), v.Cap())
+		return val
 	case reflect.Interface:
 		if v.IsNil() {
 			log.Default().Printf("deepValueClone: nil %v", v.Kind())
